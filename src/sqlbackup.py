@@ -39,3 +39,7 @@ for db_name in databases:
     export_file_name = f"{db_name}_{export_timestamp}.sql"
     command = f"mysqldump -u{user} -p{password} {db_name} > {backup_path}/{db_name}.sql &"
     subprocess.call(command, shell=True)
+
+if settings.S3_ENABLED:
+    command = f"aws s3 sync {backup_path} {settings.S3_BUCKET}{settings.S3_PATH}"
+    subprocess.call(command, shell=True)
