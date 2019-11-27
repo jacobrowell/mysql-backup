@@ -37,7 +37,7 @@ databases = [db[0] for db in databases if db[0] not in DB_BLACKLIST]
 
 for db_name in databases:
     export_file_name = f"{db_name}_{export_timestamp}.sql"
-    command = f"mysqldump -u{user} -p{password} {db_name} > {backup_path}/{db_name}.sql &"
+    command = f"mysqldump -u{user} -p{password} {db_name} > {backup_path}/{export_file_name}.sql &"
     subprocess.call(command, shell=True)
 
 if settings.S3_ENABLED:
