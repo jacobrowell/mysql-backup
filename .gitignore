@@ -1,5 +1,4 @@
-.idea
-config.py
-
+.idea/
+.vscode/
 .env
 Pipfile.lock
