@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+import logging
 import os
 import subprocess
+import sys
 from datetime import datetime
 
 from sqlalchemy import create_engine
@@ -23,8 +25,12 @@ user = settings.MYSQL_USER
 password = settings.MYSQL_PASS
 backup_path = settings.BACKUP_PATH
 
-if not os.path.exists(backup_path) or not os.path.isdir(backup_path):
-    os.mkdir(backup_path, 0o755)
+if not os.path.isdir(backup_path):
+    if os.path.exists(backup_path):
+        logging.error("backup path exists and is not a directory")
+        sys.exit(1)
+    else:
+        os.makedirs(backup_path, 0o755)
 
 databases = engine.execute("SHOW DATABASES").fetchall()
 databases = [db[0] for db in databases if db[0] not in DB_BLACKLIST]
