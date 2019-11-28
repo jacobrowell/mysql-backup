@@ -51,5 +51,5 @@ for db_name in databases:
     subprocess.call(command, shell=True)
 
 if settings.S3_ENABLED:
-    command = f"aws s3 sync {backup_path} {settings.S3_BUCKET}{settings.S3_PATH}"
+    command = f"/usr/local/bin/aws s3 sync {backup_path} {settings.S3_BUCKET}{settings.S3_PATH}"
     subprocess.call(command, shell=True)
