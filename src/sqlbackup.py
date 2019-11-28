@@ -5,12 +5,13 @@ import subprocess
 import sys
 from datetime import datetime
 
+import argparse
 from sqlalchemy import create_engine
 
 import settings
 
 
-DB_BLACKLIST = ['mysql', 'phpmyadmin', 'information_schema', 'performance_schema']
+DB_BLACKLIST = ['information_schema', 'mysql', 'performance_schema', 'phpmyadmin', 'sys']
 
 engine = create_engine("mysql+pymysql://{}:{}@{}:{}/?charset=utf8mb4".format(
     settings.MYSQL_USER,
@@ -18,6 +19,10 @@ engine = create_engine("mysql+pymysql://{}:{}@{}:{}/?charset=utf8mb4".format(
     settings.MYSQL_HOST,
     settings.MYSQL_PORT,
 ))
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-d', '--dbnames', type=str, default='', help='Names of databases to export. Default: empty (export all)')
+args = parser.parse_args()
 
 export_timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
 
@@ -35,9 +40,14 @@ if not os.path.isdir(backup_path):
 databases = engine.execute("SHOW DATABASES").fetchall()
 databases = [db[0] for db in databases if db[0] not in DB_BLACKLIST]
 
+if args.dbnames:
+    dbnames = list(map(str.strip, args.dbnames.split(',')))
+    databases = [db for db in databases if db in dbnames]
+
 for db_name in databases:
     export_file_name = f"{db_name}_{export_timestamp}.sql"
-    command = f"mysqldump -u{user} -p{password} {db_name} > {backup_path}/{export_file_name}.sql &"
+    export_path = os.path.join(backup_path, export_file_name)
+    command = f"mysqldump -u{user} -p{password} {db_name} > {export_path} &"
     subprocess.call(command, shell=True)
 
 if settings.S3_ENABLED:

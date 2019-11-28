@@ -12,6 +12,7 @@ configparser = "*"
 python-dotenv = "*"
 sqlalchemy = "*"
 pymysql = "*"
+argparse = "*"
 
 [pipenv]
 allow_prereleases = true
